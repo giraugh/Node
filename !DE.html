@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>!ERROR!</title>
+	<script type="text/javascript">
+		function game_background(){return 'white';}
+		function game_wbackground(){return 'black';}
+		function game_title(){return 'NEW GAME';}
+		function game_width(){return 1000;}
+		function game_height(){return 1000;}
+		
+		/*BONUS FUNCTION*/
+		function log(x){console.log(x);}
+		
+		/*INITIALIZE GAME*/
+		window.game = {};
+		window.game.keys = new Array();
+		window.game.keys.last = "";
+		
+		/*KEYBOARD CHECKING*/
+		for (var i=0;i<300;i++){window.game.keys[i]=false;}
+		document.onkeypress = function (e) { 
+			e = e || window.event; 
+			var code = e.keyCode;
+			if (window.game.keys[code] == 0)
+			{window.game.keys[code] = 2;window.game.keys.last = code;}
+			if(e.keyCode == 32 && e.target == document.body) {
+				e.preventDefault();
+			}
+		};
+		
+		document.onkeyup = function (e) { 
+			e = e || window.event; 
+			var code = e.keyCode + 32;
+			if (code == 64){code = 32;}
+			window.game.keys[code] = 0;
+		};
+		
+		function getKey(x)
+		{
+			var c = x.charCodeAt(0);
+			return window.game.keys[c] > 0;
+		}
+		
+		function press(x)
+		{
+			var c = x.charCodeAt(0);
+			window.game.keys[c] = 2;
+		}
+		
+		function unPress(x)
+		{
+			var c = x.charCodeAt(0);
+			window.game.keys[c] = 0;
+		}
+		
+		function getKeyPressed(x)
+		{
+			var c = x.charCodeAt(0);
+			return window.game.keys[c] == 2 ? true : false;
+		}
+		
+		function updatePressed(x)
+		{
+			for (var i=0;i<300;i++){
+				window.game.keys[i] = window.game.keys[i] == 2 ? 1 : window.game.keys[i];
+			}
+		}
+		
+		/* MOUSE CHECKING */
+		mouse = {x:0, y:0, left: 0, right: 0, middle: 0, nx: 0, ny: 0};
+		
+		document.onmousemove = function(e){
+			mouse.x = e.pageX - gameC.position.x;
+			mouse.y = e.pageY - gameC.position.y;
+			mouse.nx = e.pageX;
+			mouse.ny = e.pageY;
+		}
+		
+		document.onmousedown = function(e)
+		{
+			if (e.button == 0 && mouse.left == 0){mouse.left = 2;}
+			if (e.button == 1 && mouse.middle == 0){mouse.middle = 2;}
+			if (e.button == 2 && mouse.right == 0){mouse.right = 2;}
+		}
+		
+		document.onmouseup = function(e)
+		{
+			if (e.button == 0){mouse.left = 0;}
+			if (e.button == 1){mouse.middle = 0;}
+			if (e.button == 2){mouse.right = 0;}
+		}
+		
+		function updateMouse()
+		{
+			mouse.left = mouse.left == 2 ? 1 : mouse.left;
+			mouse.middle = mouse.middle == 2 ? 1 : mouse.middle;
+			mouse.right = mouse.right == 2 ? 1 : mouse.right;
+		}
+
+	</script>
+	<script type="text/javascript" src="cycle.js"></script>
+	<script type="text/javascript" src="Header.js"></script>
+	<script type="text/javascript" src="IOHeader.js"></script>
+	<script type="text/javascript" src="Help.js"></script>
+	<script type="text/javascript" src="Game.js"></script>
+	<script type="text/javascript">
+		document.title = game_title();
+		function engine_draw()
+		{
+			if (document.getElementById('canvas').getContext)
+			{var ctx = document.getElementById('canvas').getContext('2d');}
+			else
+			{alert("BROWSER UNSUPPORTED");}
+			ctx.fillStyle = game_background();
+			ctx.fillRect(0-gameC.position.x,0-gameC.position.y,document.getElementById('canvas').width,document.getElementById('canvas').height);
+			game_draw(ctx,window.game);
+			updatePressed();
+			updateMouse();
+			window.requestAnimationFrame(engine_draw);
+		}
+	
+		function engine_init()
+		{
+			document.getElementById('canvas').width = game_width();
+			document.getElementById('canvas').height = game_height();
+			document.getElementById('body').style = "background-color:"+game_wbackground()+";"
+			game_init(window.game);
+			engine_draw();
+		}
+	</script>
+  <style>
+	a {
+		color: white;
+		font-family: "Courier New", Georgia;
+	}
+	
+	input[type="text"], input[type="button"], select {
+		background-color : #d1d1d1; 
+		//border: 3px solid white;
+		font-family: "Courier New", Georgia;
+	}
+	
+	input[type="text"]:disabled {
+		background-color : #6d6d6d; 
+	}
+	
+	input[type="checkbox"] {
+		margin-bottom: 0;
+		margin-left: 0;
+		margin-right: 15px;
+		position: relative;
+		top: 3px;
+	}
+	
+	input[type="file"] {
+		display: none;
+	}
+	
+	select option[disabled] {
+		display: none;
+	}
+	
+  </style>
+  </head>
+  
+  <body id ="body" onload="engine_init();" style="background-color: black;">
+	<a>Node Type </a>
+	<select id="CreateType">
+	  <option value="Pass">Pass Through</option>
+	  <option value="Add">Add</option>
+	  <option value="Subtract">Subtract</option>
+	  <option value="Multiply">Multiply</option>
+	  <option value="Divide">Divide</option>
+	  <option value="Value">Value</option>
+	  <option value="Random">Random</option>
+	  <option value="Hex">Return Hex</option>
+	  <option value="Set">Set Variable</option>
+	  <option value="Get">Get Variable</option>
+	  <option value="Calculate">Calculate</option>
+	  <option value="Do">Do Stage</option>
+	  <option value="Return">Return Value</option>
+	  <option value="If">Do Stage If</option>
+	  <option value="Equal">GATE: Equal</option>
+	  <option value="Larger">GATE: Larger</option>
+	  <option value="Not">GATE: Not</option>
+	</select>&nbsp &nbsp
+	<a>Value </a><input type="text" id="value" value="0";></input>&nbsp
+	<a>Stage </a><input type="text" id="stage" value="1";></input>&nbsp
+	<a>Show Values </a><input type="checkbox" id="showValues"></input>
+	<a>Muted </a><input type="checkbox" id="muted"></input>
+	<input id="load-file" class="fileinput" type="file">
+	<input type="button" id="load" value="Load" onclick="document.getElementById('load-file').click();"></input>
+	<input type="button" id="save" value="Save" onclick="downloadSave();"></input>
+	<input type="button" id="export" value="Export" onclick="exportScript();"></input>
+	<input type="button" id="help" value="Help" onclick="showHelp();"></input>
+    <canvas id="canvas" oncontextmenu="return false;" width="1000" height="1000" style="background-color: white;"></canvas>
+  </body>
+  
+</html>
